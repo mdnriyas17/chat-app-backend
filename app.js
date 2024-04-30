@@ -283,7 +283,9 @@ app.get("/api/users/:userId", async (req, res) => {
     console.log("Error", error);
   }
 });
-
+app.get('/api', (req, res) => {
+  res.send('Hello World!')
+})
 app.listen(port, () => {
   console.log("listening on port " + port);
 });
