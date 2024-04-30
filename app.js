@@ -4,9 +4,11 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv").config();
-const io = require("socket.io")(8080, {
+const app = express();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
   },
 });
 
@@ -19,7 +21,6 @@ const Conversations = require("./models/Conversations");
 const Messages = require("./models/Messages");
 
 // app Use
-const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
@@ -140,16 +141,14 @@ app.post("/api/login", async (req, res, next) => {
                 }
               );
               user.save();
-              return res
-                .status(200)
-                .json({
-                  user: {
-                    id: user._id,
-                    email: user.email,
-                    fullName: user.fullName,
-                  },
-                  token: token,
-                });
+              return res.status(200).json({
+                user: {
+                  id: user._id,
+                  email: user.email,
+                  fullName: user.fullName,
+                },
+                token: token,
+              });
             }
           );
         }
@@ -283,9 +282,9 @@ app.get("/api/users/:userId", async (req, res) => {
     console.log("Error", error);
   }
 });
-app.get('/api', (req, res) => {
-  res.send('Hello World!')
-})
-app.listen(port, () => {
+app.get("/api", (req, res) => {
+  res.send("Hello World!");
+});
+server.listen(port, () => {
   console.log("listening on port " + port);
 });
